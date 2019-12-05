@@ -7,11 +7,11 @@ import org.usfirst.frc.team4488.lib.util.app.math.RigidTransform2d;
 import org.usfirst.frc.team4488.lib.util.app.math.Rotation2d;
 import org.usfirst.frc.team4488.lib.util.app.math.Translation2d;
 import org.usfirst.frc.team4488.robot.Constants;
-import org.usfirst.frc.team4488.robot.app.RobotState;
 import org.usfirst.frc.team4488.robot.app.paths.PathBuilder;
 import org.usfirst.frc.team4488.robot.app.paths.PathBuilder.Waypoint;
 import org.usfirst.frc.team4488.robot.app.paths.PathContainer;
-import org.usfirst.frc.team4488.robot.systems.Drive;
+import org.usfirst.frc.team4488.robot.loops.RobotStateLoop;
+import org.usfirst.frc.team4488.robot.systems.drive.Drive;
 
 public class PathFinder {
 
@@ -222,7 +222,11 @@ public class PathFinder {
   public void zeroAtVisionTarget() {
     int[] closest = field.visionTargets.get(0);
     Translation2d currentPos =
-        RobotState.getInstance().getLatestFieldToVehicle().getValue().getTranslation();
+        RobotStateLoop.getInstance()
+            .getEstimator()
+            .getLatestFieldToVehicle()
+            .getValue()
+            .getTranslation();
     int currX = (int) currentPos.x();
     int currY = (int) currentPos.y();
     for (int[] target : field.visionTargets) {
@@ -231,7 +235,8 @@ public class PathFinder {
           < calcDist(currX, currY, closest[0], closest[1])) closest = target;
     }
 
-    RobotState.getInstance()
+    RobotStateLoop.getInstance()
+        .getEstimator()
         .reset(
             Timer.getFPGATimestamp(),
             new RigidTransform2d(

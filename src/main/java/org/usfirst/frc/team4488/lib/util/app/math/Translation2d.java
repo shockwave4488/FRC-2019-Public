@@ -1,10 +1,10 @@
 package org.usfirst.frc.team4488.lib.util.app.math;
 
 import java.text.DecimalFormat;
-import org.usfirst.frc.team4488.lib.util.app.Interpolable;
+import org.usfirst.frc.team4488.lib.util.app.Util;
 
 /** A translation in a 2d coordinate frame. Translations are simply shifts in an (x, y) plane. */
-public class Translation2d implements Interpolable<Translation2d> {
+public class Translation2d implements ITranslation2d<Translation2d> {
   protected static final Translation2d kIdentity = new Translation2d();
 
   public static final Translation2d identity() {
@@ -135,5 +135,30 @@ public class Translation2d implements Interpolable<Translation2d> {
 
   public static double cross(Translation2d a, Translation2d b) {
     return a.x_ * b.y_ - a.y_ * b.x_;
+  }
+
+  public boolean epsilonEquals(final Translation2d other, double epsilon) {
+    return Util.epsilonEquals(x(), other.x(), epsilon)
+        && Util.epsilonEquals(y(), other.y(), epsilon);
+  }
+
+  @Override
+  public Translation2d getTranslation() {
+    return this;
+  }
+
+  @Override
+  public double distance(final Translation2d other) {
+    return inverse().translateBy(other).norm();
+  }
+
+  @Override
+  public String toCSV() {
+    final DecimalFormat fmt = new DecimalFormat("#0.000");
+    return fmt.format(x_) + "," + fmt.format(y_);
+  }
+
+  public static Translation2d fromPolar(Rotation2d direction, double magnitude) {
+    return new Translation2d(direction.cos() * magnitude, direction.sin() * magnitude);
   }
 }

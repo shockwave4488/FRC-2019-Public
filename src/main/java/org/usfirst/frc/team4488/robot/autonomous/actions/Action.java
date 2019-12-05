@@ -5,7 +5,7 @@ package org.usfirst.frc.team4488.robot.autonomous.actions;
  * action, called by the method runAction in AutoModeBase (or more commonly in autonomous modes that
  * extend AutoModeBase)
  *
- * @see com.team254.frc2017.auto.AutoModeBase#runAction
+ * @see org.usfirst.frc.team4488.frc2017.auto.AutoModeBase#runAction
  */
 public interface Action {
 

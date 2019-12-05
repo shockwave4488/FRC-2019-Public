@@ -3,14 +3,13 @@ package org.usfirst.frc.team4488.lib.util.app.math;
 import static org.usfirst.frc.team4488.lib.util.app.Util.epsilonEquals;
 
 import java.text.DecimalFormat;
-import org.usfirst.frc.team4488.lib.util.app.Interpolable;
 
 /**
  * A rotation in a 2d coordinate frame represented a point on the unit circle (cosine and sine).
  *
  * <p>Inspired by Sophus (https://github.com/strasdat/Sophus/tree/master/sophus)
  */
-public class Rotation2d implements Interpolable<Rotation2d> {
+public class Rotation2d implements IRotation2d<Rotation2d> {
   protected static final Rotation2d kIdentity = new Rotation2d();
 
   public static final Rotation2d identity() {
@@ -144,5 +143,21 @@ public class Rotation2d implements Interpolable<Rotation2d> {
   public String toString() {
     final DecimalFormat fmt = new DecimalFormat("#0.000");
     return "(" + fmt.format(getDegrees()) + " deg)";
+  }
+
+  @Override
+  public Rotation2d getRotation() {
+    return this;
+  }
+
+  @Override
+  public double distance(final Rotation2d other) {
+    return inverse().rotateBy(other).getRadians();
+  }
+
+  @Override
+  public String toCSV() {
+    final DecimalFormat fmt = new DecimalFormat("#0.000");
+    return fmt.format(getDegrees());
   }
 }

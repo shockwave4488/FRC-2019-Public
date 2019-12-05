@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4488.lib.util.app.math;
 
+import org.usfirst.frc.team4488.lib.util.app.Util;
+
 /**
  * A movement along an arc at constant curvature and velocity. We can use ideas from "differential
  * calculus" to create new RigidTransform2d's from a Twist2d and visa versa.
@@ -26,5 +28,18 @@ public class Twist2d {
 
   public Twist2d scaled(double scale) {
     return new Twist2d(dx * scale, dy * scale, dtheta * scale);
+  }
+
+  public double norm() {
+    if (dy == 0.0) {
+      return Math.abs(dx);
+    }
+
+    return Math.hypot(dx, dy);
+  }
+
+  public double curvature() {
+    if (Math.abs(dtheta) < Util.kEpsilon && norm() < Util.kEpsilon) return 0.0;
+    return dtheta / norm();
   }
 }

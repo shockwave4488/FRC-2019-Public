@@ -5,4 +5,6 @@ public enum RobotName {
   Competition,
   ProgrammingPlatform,
   BareRoboRIO,
+  SwervePlatform,
+  MockPlatform
 }

@@ -1,7 +1,7 @@
 package org.usfirst.frc.team4488.robot.autonomous.actions;
 
 import org.usfirst.frc.team4488.robot.operator.Logging;
-import org.usfirst.frc.team4488.robot.systems.Drive;
+import org.usfirst.frc.team4488.robot.systems.drive.Drive;
 
 /**
  * Waits for the robot to pass by a provided path marker (i.e. a waypoint on the field). This action

@@ -1,24 +1,17 @@
 package org.usfirst.frc.team4488.robot;
 
-import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team4488.lib.util.NavX;
-import org.usfirst.frc.team4488.robot.app.RobotState;
 import org.usfirst.frc.team4488.robot.autonomous.AutoModeExecuter;
 import org.usfirst.frc.team4488.robot.autonomous.AutoModeSelector;
 import org.usfirst.frc.team4488.robot.loops.Looper;
-import org.usfirst.frc.team4488.robot.loops.RobotStateEstimator;
+import org.usfirst.frc.team4488.robot.loops.RobotStateLoop;
 import org.usfirst.frc.team4488.robot.operator.Controllers;
 import org.usfirst.frc.team4488.robot.operator.Logging;
-import org.usfirst.frc.team4488.robot.systems.Arm;
-import org.usfirst.frc.team4488.robot.systems.Camera;
-import org.usfirst.frc.team4488.robot.systems.Climber;
-import org.usfirst.frc.team4488.robot.systems.Drive;
-import org.usfirst.frc.team4488.robot.systems.LEDController;
+import org.usfirst.frc.team4488.robot.systems.SpiderBotClimb;
 import org.usfirst.frc.team4488.robot.systems.SubsystemManager;
-import org.usfirst.frc.team4488.robot.systems.Turret;
+import org.usfirst.frc.team4488.robot.systems.drive.DriveBase;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -28,159 +21,138 @@ import org.usfirst.frc.team4488.robot.systems.Turret;
  */
 public class Robot extends TimedRobot {
 
-  private Drive drive;
   private Looper looper;
   private Looper constantLooper;
 
   private AutoModeExecuter mAutoModeExecuter = null;
-  private RobotState robotState = RobotState.getInstance();
   private Logging logger = Logging.getInstance();
-  private Climber climber = Climber.getInstance();
-  private Arm arm = Arm.getInstance();
   public static Timer timer;
   private SubsystemManager subsystemManager;
   public static boolean isAuto = false;
+  private DriveBase drive;
 
   /** Run once as soon as code is loaded onto the RoboRio */
   @Override
   public void robotInit() {
-    logger.writeRaw("Robot Started!");
+    logger.writeToLogFormatted(this, "Robot Started!");
 
     looper = new Looper();
     constantLooper = new Looper();
 
-    subsystemManager = SubsystemManager.getInstance();
-
-    if (RobotMap.driveExists) {
-      drive = Drive.getInstance();
-      drive.resetAngle();
-    }
+    RobotSystems systems = RobotMap.robotSelector();
+    drive = systems.drive;
+    subsystemManager = SubsystemManager.createInstance(systems);
+    looper.register(RobotStateLoop.createInstance(drive.getStateEstimator()));
 
     AutoModeSelector.init();
 
-    looper.register(RobotStateEstimator.getInstance());
     subsystemManager.registerEnabledLoops(looper);
     subsystemManager.zeroSensors();
+
+    // addTrackables(logger);
+
+    logger.addStringTrackable(
+        () -> Controllers.getInstance().getPrimaryControllerLogging(),
+        "PrimaryContLog",
+        20,
+        "TimeStamp,A,B,X,Y,LBump,RBump,LTrig,RTrig,LStickPress,RStickPress,Start,Select,LStickX,LStickY,RStickX,RStickY,Dpad\n");
+    logger.addStringTrackable(
+        () -> Controllers.getInstance().getSecondaryControllerLogging(),
+        "SecondaryContLog",
+        20,
+        "TimeStamp,A,B,X,Y,LBump,RBump,LTrig,RTrig,LStickPress,RStickPress,Start,Select,LStickX,LStickY,RStickX,RStickY,Dpad\n");
+    /*logger.addTrackable(
+    () ->
+    RobotStateLoop.getInstance().getEstimator()
+            .getLatestFieldToVehicle()
+            .getValue()
+            .getRotation()
+            .getDegrees(),
+    "PoseTheta",
+    5);*/
+
+    // logger.addTrackable(() ->
+    // RobotStateLoop.getInstance().getEstimator().getLatestFieldToVehicle().getValue().getTranslation().x(), "PoseX", 5);
+    // logger.addTrackable(() ->
+    // RobotStateLoop.getInstance().getEstimator().getLatestFieldToVehicle().getValue().getTranslation().y(), "PoseY", 5);
     // Register anything for the constant looper here
-    constantLooper.register(Camera.getInstance());
-    LEDController.getInstance().registerEnabledLoops(constantLooper);
     constantLooper.start();
 
-    CameraServer.getInstance().addAxisCamera("Axis Cam", "10.44.88.11");
-
-    Camera.getInstance().ledOff();
-
-    logger.addTrackable(() -> Arm.getInstance().getAngle(), "ArmAngle", 5);
-    logger.addTrackable(() -> Arm.getInstance().getLength(), "ArmLength", 5);
-    logger.addTrackable(() -> Turret.getInstance().getSpecificAngle(), "TurretAngle", 5);
-    logger.addTrackable(() -> Arm.getInstance().getDesiredAngle(), "ArmDesiredAngle", 5);
-    logger.addTrackable(() -> Arm.getInstance().getDesiredLength(), "ArmDesiredLength", 5);
-    logger.addTrackable(() -> Turret.getInstance().getTargetAngle(), "TurretDesiredAngle", 5);
-    logger.addTrackable(() -> Drive.getInstance().getFrontYaw(), "FrontYaw", 5);
-    logger.addTrackable(() -> Drive.getInstance().getRioYaw(), "RioYaw", 5);
-    logger.addTrackable(() -> Drive.getInstance().getAngle(), "DriveAngle", 5);
-    logger.addTrackable(
-        () ->
-            RobotState.getInstance()
-                .getLatestFieldToVehicle()
-                .getValue()
-                .getRotation()
-                .getDegrees(),
-        "PoseTheta",
-        5);
-    logger.addTrackable(() -> RobotState.getInstance().getLatestFieldToVehicle().getValue().getTranslation().x(), "PoseX", 5);
-    logger.addTrackable(() -> RobotState.getInstance().getLatestFieldToVehicle().getValue().getTranslation().y(), "PoseY", 5);
-
+    // CameraServer.getInstance().addAxisCamera("Axis Cam", "10.44.88.11");
   }
 
   /** This function is called periodically during all modes */
   @Override
   public void robotPeriodic() {
     subsystemManager.updateSmartDashboard();
-    robotState.updateSmartDashboard();
+    // robotState.updateSmartDashboard();
     logger.update();
-
-    double fused = NavX.getInstance().getAHRS().getFusedHeading();
-    SmartDashboard.putNumber("fused", fused > 180 ? fused - 360 : fused);
   }
 
   /** Run once at the beginning of autonomous mode */
   @Override
   public void autonomousInit() {
     logger = Logging.forceInstance();
-
-    logger.addTrackable(() -> Arm.getInstance().getAngle(), "ArmAngle", 5);
-    logger.addTrackable(() -> Arm.getInstance().getLength(), "ArmLength", 5);
-    logger.addTrackable(() -> Turret.getInstance().getSpecificAngle(), "TurretAngle", 5);
-    logger.addTrackable(() -> Arm.getInstance().getDesiredAngle(), "ArmDesiredAngle", 5);
-    logger.addTrackable(() -> Arm.getInstance().getDesiredLength(), "ArmDesiredLength", 5);
-    logger.addTrackable(() -> Turret.getInstance().getTargetAngle(), "TurretDesiredAngle", 5);
-    logger.addTrackable(
-        () ->
-            RobotState.getInstance()
-                .getLatestFieldToVehicle()
-                .getValue()
-                .getRotation()
-                .getDegrees(),
-        "PoseTheta",
-        5);
-    logger.addTrackable(() -> Drive.getInstance().getAngle(), "DriveAngle", 5);
-    logger.addTrackable(() -> Drive.getInstance().getFrontYaw(), "FrontYaw", 5);
-    logger.addTrackable(() -> Drive.getInstance().getRioYaw(), "RioYaw", 5);
-    logger.addTrackable(() -> RobotState.getInstance().getLatestFieldToVehicle().getValue().getTranslation().x(), "PoseX", 5);
-    logger.addTrackable(() -> RobotState.getInstance().getLatestFieldToVehicle().getValue().getTranslation().y(), "PoseY", 5);
+    /*logger.addTrackable(
+    () ->
+    RobotStateLoop.getInstance().getEstimator()
+            .getLatestFieldToVehicle()
+            .getValue()
+            .getRotation()
+            .getDegrees(),
+    "PoseTheta",
+    5);*/
+    logger.addTrackable(() -> NavX.getInstance().getYaw().getDegrees(), "DriveAngle", 5);
+    // logger.addTrackable(() ->
+    // RobotStateLoop.getInstance().getEstimator().getLatestFieldToVehicle().getValue().getTranslation().x(), "PoseX", 5);
+    // logger.addTrackable(() ->
+    // RobotStateLoop.getInstance().getEstimator().getLatestFieldToVehicle().getValue().getTranslation().y(), "PoseY", 5);
 
     isAuto = true;
-    logger.writeRaw("Autonomous Init");
+    logger.writeToLogFormatted(this, "Autonomous Init");
     looper.start();
     /*
      * if (mAutoModeExecuter != null) { mAutoModeExecuter.stop(); }
      */
 
-    if (RobotMap.driveExists) {
-      drive.resetAngle();
-    }
-
-    if (RobotMap.driveExists == true) {
-      Drive.getInstance().configPercentVbus();
-    }
+    drive.resetAngle();
+    drive.configPercentVbus();
 
     // mAutoModeExecuter = null;
     subsystemManager.zeroSensors();
     wait(250); // Encoder values and other sensor data is not valid until 250ms after they are
     // reset
-
+    SpiderBotClimb.getInstance().spiderUp();
     /*
      * mAutoModeExecuter = new AutoModeExecuter();
      * mAutoModeExecuter.setAutoMode(AutoModeSelector.getSelectedAutoMode());
      * mAutoModeExecuter.start();
      */
+
+    // addTrackables(logger);
   }
 
   @Override
   public void teleopInit() {
     isAuto = false;
-    logger.writeRaw("Teleop Init");
+    logger.writeToLogFormatted(this, "Teleop Init");
 
-    if (RobotMap.driveExists == true) {
-      Drive.getInstance().configPercentVbus();
-    }
+    drive.configPercentVbus();
 
     looper.start();
+
+    NavX.getInstance().reset();
   }
 
   /** This function is called periodically during autonomous */
   @Override
-  public void autonomousPeriodic() {
-    teleopPeriodic();
-  }
-
+  public void autonomousPeriodic() {}
   /** This function is called periodically during operator control */
   @Override
   public void teleopPeriodic() {
     Controllers xbox = Controllers.getInstance();
 
-    if (xbox.getStart(xbox.m_secondary)) {
+    if (xbox.getStart(xbox.m_primary)) {
       subsystemManager.reset();
     }
 
@@ -189,7 +161,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    logger.writeRaw("Test Init");
+    logger.writeToLogFormatted(this, "Test Init");
   }
 
   /** This function is called periodically during test mode */
@@ -199,7 +171,7 @@ public class Robot extends TimedRobot {
   /** This function is called once as soon as the robot is disabled */
   @Override
   public void disabledInit() {
-    logger.writeRaw("Robot Disabled!");
+    logger.writeToLogFormatted(this, "Robot Disabled!");
 
     if (mAutoModeExecuter != null) {
       mAutoModeExecuter.stop();
@@ -217,6 +189,39 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {}
+
+  public void addTrackables(Logging logger) {
+    /*logger.addTrackable(
+        () ->
+            RobotStateLoop.getInstance()
+                .getEstimator()
+                .getLatestFieldToVehicle()
+                .getValue()
+                .getRotation()
+                .getDegrees(),
+        "PoseTheta",
+        5);
+    logger.addTrackable(
+        () ->
+            RobotStateLoop.getInstance()
+                .getEstimator()
+                .getLatestFieldToVehicle()
+                .getValue()
+                .getTranslation()
+                .x(),
+        "PoseX",
+        5);
+    logger.addTrackable(
+        () ->
+            RobotStateLoop.getInstance()
+                .getEstimator()
+                .getLatestFieldToVehicle()
+                .getValue()
+                .getTranslation()
+                .y(),
+        "PoseY",
+        5);*/
+  }
 
   private void wait(int milliseconds) {
     try {

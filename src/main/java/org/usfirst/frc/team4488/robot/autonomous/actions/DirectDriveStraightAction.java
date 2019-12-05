@@ -1,8 +1,8 @@
 package org.usfirst.frc.team4488.robot.autonomous.actions;
 
 import org.usfirst.frc.team4488.robot.operator.Logging;
-import org.usfirst.frc.team4488.robot.systems.Drive;
-import org.usfirst.frc.team4488.robot.systems.SmartDrive;
+import org.usfirst.frc.team4488.robot.systems.drive.Drive;
+import org.usfirst.frc.team4488.robot.systems.drive.SmartDrive;
 
 public class DirectDriveStraightAction implements Action {
   Logging logger = Logging.getInstance();

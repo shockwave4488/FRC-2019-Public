@@ -3,7 +3,7 @@ package org.usfirst.frc.team4488.robot.autonomous.actions;
 import org.usfirst.frc.team4488.lib.util.app.control.Path;
 import org.usfirst.frc.team4488.robot.app.paths.PathContainer;
 import org.usfirst.frc.team4488.robot.operator.Logging;
-import org.usfirst.frc.team4488.robot.systems.Drive;
+import org.usfirst.frc.team4488.robot.systems.drive.Drive;
 
 /**
  * Drives the robot along the Path defined in the PathContainer object. The action finishes once the

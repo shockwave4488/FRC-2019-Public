@@ -1,6 +1,14 @@
 package org.usfirst.frc.team4488.robot;
 
+import org.usfirst.frc.team4488.lib.util.app.math.Pose2d;
+import org.usfirst.frc.team4488.lib.util.app.math.Rotation2d;
+import org.usfirst.frc.team4488.lib.util.app.math.Translation2d;
+
 public class Constants {
+
+  // VPP Poses
+  public static final Pose2d kRobotLeftStartingPose =
+      new Pose2d(new Translation2d(10, 10), Rotation2d.fromDegrees(0));
 
   /*
    *  Drive Subsystem Constants
@@ -17,8 +25,10 @@ public class Constants {
   /*
    * APP Constants
    */
+  public static boolean kIsUsingTractionWheels = false;
   public static double brakeFactor = 1.0; // used to limit APP speeds during testing
 
+  public static double kTrackLengthInches = 27.375; // Distance from front to back robot
   public static double kTrackWidthInches = 27.375; // Distance from left to right tank drive wheels
   public static double kTrackScrubFactor =
       0.924; // Factor to compensate for slipping of wheels while turning, must be adjusted
@@ -30,10 +40,11 @@ public class Constants {
   public static double kDriveHighGearVelocityRampRate = 0.25;
 
   // Path following constants
+  public static double kPathLookaheadTime = 0.25;
   public static double kMinLookAhead = 12.0; // inches
   public static double kMinLookAheadSpeed = 9.0; // inches per second
   public static double kMaxLookAhead = 48.0; // inches
-  public static double kMaxLookAheadSpeed = 140.0; // inches per second
+  public static double kMaxLookAheadSpeed = 120.0; // inches per second
   public static double kDeltaLookAhead = kMaxLookAhead - kMinLookAhead; // inches
   public static double kDeltaLookAheadSpeed =
       kMaxLookAheadSpeed - kMinLookAheadSpeed; // inches per second
@@ -52,8 +63,8 @@ public class Constants {
   // Path Follower Motion Profiling Constants
   public static double kInertiaSteeringGain = 0.0;
   public static double kSegmentCompletionTolerance = 0.1; // inches
-  public static double kPathFollowingMaxAccel = 70.0 / brakeFactor; // inches per second^2
-  public static double kPathFollowingMaxVel = 140.0 / brakeFactor; // inches per second
+  public static double kPathFollowingMaxAccel = 65.0 / brakeFactor; // inches per second^2
+  public static double kPathFollowingMaxVel = 100.0 / brakeFactor; // inches per second
   public static double kPathFollowingProfileKp = 5.00;
   public static double kPathFollowingProfileKi = 0.03;
   public static double kPathFollowingProfileKv = 0.02;
@@ -171,8 +182,5 @@ public class Constants {
 
   public static final double armStationaryRange = 0.1;
 
-  public static final int leftBlueEndOffset = -3;
-  public static final int leftRedEndOffset = 0;
-  public static final int rightBlueEndOffset = 3; // Good
-  public static final int rightRedEndOffset = 1;
+  public static final double swerveTopSpeed = 12; // not final - should be measured
 }

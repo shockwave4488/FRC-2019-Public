@@ -138,4 +138,190 @@ public class Controllers {
   public boolean getDPadPressed(XboxController controller) {
     return controller.getPOV(0) > -1;
   }
+
+  public String getPrimaryControllerLogging() {
+    String toReturn = "";
+    if (getA(m_primary)) {
+      toReturn += ",1,";
+    } else {
+      toReturn += ",0,";
+    }
+
+    if (getB(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getX(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getY(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getLeftBumper(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getRightBumper(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getLeftTrigger(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getRightTrigger(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getLeftStickPress(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getRightStickPress(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getStart(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getSelect(m_primary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    toReturn += getLeftStickX(m_primary) + ",";
+
+    toReturn += getLeftStickY(m_primary) + ",";
+
+    toReturn += getRightStickX(m_primary) + ",";
+
+    toReturn += getRightStickY(m_primary) + ",";
+
+    toReturn += getDPad(m_primary);
+
+    return toReturn;
+  }
+
+  public String getSecondaryControllerLogging() {
+    String toReturn = "";
+    if (getA(m_secondary)) {
+      toReturn += ",1,";
+    } else {
+      toReturn += ",0,";
+    }
+
+    if (getB(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getX(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getY(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getLeftBumper(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getRightBumper(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getLeftTrigger(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getRightTrigger(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getLeftStickPress(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getRightStickPress(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getStart(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    if (getSelect(m_secondary)) {
+      toReturn += "1,";
+    } else {
+      toReturn += "0,";
+    }
+
+    toReturn += getLeftStickX(m_secondary) + ",";
+
+    toReturn += getLeftStickY(m_secondary) + ",";
+
+    toReturn += getRightStickX(m_secondary) + ",";
+
+    toReturn += getRightStickY(m_secondary) + ",";
+
+    toReturn += getDPad(m_secondary);
+
+    return toReturn;
+  }
+
+  public double deadzone(double val, double deadzone) {
+    if (Math.abs(val) > Math.abs(deadzone)) {
+      if (val > 0) {
+        return (val - deadzone) / (1 - deadzone);
+      } else {
+        return (val + deadzone) / (1 - deadzone);
+      }
+    }
+
+    return 0;
+  }
 }

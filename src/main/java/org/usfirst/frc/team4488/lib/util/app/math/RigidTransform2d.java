@@ -180,4 +180,8 @@ public class RigidTransform2d implements Interpolable<RigidTransform2d> {
   public String toString() {
     return "T:" + translation_.toString() + ", R:" + rotation_.toString();
   }
+
+  public Pose2d toPose2d() {
+    return new Pose2d(translation_, rotation_);
+  }
 }

@@ -1,8 +1,8 @@
 package org.usfirst.frc.team4488.robot.autonomous.actions;
 
 import org.usfirst.frc.team4488.lib.util.app.math.Translation2d;
-import org.usfirst.frc.team4488.robot.app.RobotState;
 import org.usfirst.frc.team4488.robot.autonomous.PathFinder;
+import org.usfirst.frc.team4488.robot.loops.RobotStateLoop;
 
 public class GenerateAndDrivePathAction implements Action {
 
@@ -19,7 +19,11 @@ public class GenerateAndDrivePathAction implements Action {
   @Override
   public void start() {
     Translation2d pos =
-        RobotState.getInstance().getLatestFieldToVehicle().getValue().getTranslation();
+        RobotStateLoop.getInstance()
+            .getEstimator()
+            .getLatestFieldToVehicle()
+            .getValue()
+            .getTranslation();
     driveAction =
         new DrivePathAction(
             PathFinder.generatePath((int) pos.x(), (int) pos.y(), (int) goalX, (int) goalY));

@@ -22,6 +22,9 @@ public class SimPID {
   private double doneRange;
   private boolean firstCycle;
   private boolean overrideI;
+  private boolean wrapAround;
+  private double wrapLower;
+  private double wrapHigher;
   private double maxOutput;
   private int minCycleCount;
   private int cycleCount;
@@ -47,6 +50,7 @@ public class SimPID {
     this.minCycleCount = 5;
     this.vomit = false;
 
+    wrapAround = false;
     overrideI = false;
   }
 
@@ -63,6 +67,16 @@ public class SimPID {
     this.pConst = p;
     this.iConst = i;
     this.dConst = d;
+  }
+
+  public void setWrapAround(double wrapLower, double wrapHigher) {
+    this.wrapAround = true;
+    this.wrapLower = wrapLower;
+    this.wrapHigher = wrapHigher;
+  }
+
+  public void disableWrapAround() {
+    this.wrapAround = false;
   }
 
   public void setVomitTrue() {
@@ -131,6 +145,23 @@ public class SimPID {
   public double calcPID(double current) {
     // System.out.println("calcPIDError:
     // "+Double.toString(this.desiredVal-current));
+    if (wrapAround) {
+      double directError = desiredVal - current;
+      double wrapUpError = (wrapHigher - current) + (desiredVal - wrapLower);
+      double wrapDownError = (wrapLower - current) + (desiredVal - wrapHigher);
+
+      double lowestError = directError;
+      if (Math.abs(wrapUpError) < Math.abs(lowestError)) {
+        lowestError = wrapUpError;
+      }
+
+      if (Math.abs(wrapDownError) < Math.abs(lowestError)) {
+        lowestError = wrapDownError;
+      }
+
+      return calcPIDError(lowestError);
+    }
+
     return calcPIDError(this.desiredVal - current);
   }
 
